@@ -11,3 +11,5 @@ and I confirmed with netstat -ano|findstr:8080 , started the service and I confi
 - Learned to check witch PID is running using tasklist /FI "PID eq #listening id (From netstat -ano | findstr :8080 - "no space between : and 8080"")"
 - Day 2 : Built the log parser for 20M lines (~3 GB) using streaming. The first version used substring matching and under-counted errors by ~60% (580K vs 1.55M) because the log level is uppercase. I fixed it by parsing each line as JSON and checking the level field. I added input validation (isfile), exit codes and argparse, and tested the edge cases: missing file, folder, empty file.
 - Day 3 : “My first version counted 580K errors. By breaking errors down by type, I proved it had only caught stage failures and missed all 971K HTTP 500s. The correct count was 1.55M.”
+          "Averages hide tail latency. In my log analysis, the average was 40 ms but p95 was 89 ms, so I’d always alert on percentiles"
+- Day 4: 
