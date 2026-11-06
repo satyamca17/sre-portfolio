@@ -3,6 +3,8 @@ import json
 import os
 import sys
 from collections import Counter
+import time
+import csv
 
 
 def parse_large_file(target_file: str) -> dict:
@@ -60,6 +62,7 @@ def parse_large_file(target_file: str) -> dict:
 
 
 def main():
+    start = time.perf_counter()
     parser = argparse.ArgumentParser(description="Parse large file")
     parser.add_argument("log_file", help="path to log file")
     args = parser.parse_args()
@@ -67,6 +70,22 @@ def main():
     if summary["total_lines"] == 0:
         print(f"Empty file: {args.log_file}")
         sys.exit(1)
+
+    with open("summary.json", "w", newline="") as out:
+        json.dump(summary, out, indent=2)
+
+    with open("summary.csv", "w", newline="") as out:
+        writer = csv.writer(out)
+        writer.writerow(["metric", "value"])
+        writer.writerow(["total linecount", summary['total_lines']])
+        writer.writerow(["error linecount", summary['error_lines_count']])
+        for code, count in summary["error_codes"]:
+            writer.writerow([f"error_code:{code}", count])
+        for code, count in summary['status_codes']:
+            writer.writerow([f"status_codes:{code}", count])
+        writer.writerow(["latency count", summary['latency_count']])
+        writer.writerow(["avg latency (ms)", summary['avg_latency_ms']])
+        writer.writerow(["p95 latency (ms)", summary['p95_latency_ms']])
 
     print(f"Total linecount: {summary['total_lines']}")
     print(f"Malformed linecount: {summary['malformed_lines_count']}")
@@ -76,6 +95,8 @@ def main():
     print(f"Latency count: {summary['latency_count']}")
     print(f"Avg latency (ms): {summary['avg_latency_ms']}")
     print(f"p95 latency (ms): {summary['p95_latency_ms']}")
+    elapsed = time.perf_counter() - start
+    print(f"Completed time: {elapsed:.1f} seconds")
 
 
 if __name__ == "__main__":
