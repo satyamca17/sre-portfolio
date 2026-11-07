@@ -21,6 +21,7 @@ def parse_large_file(target_file: str) -> dict:
     latency_count = 0
     latency_total = 0.0
     latencies = []
+    error_rate = 0.0
 
     with open(target_file, "r", encoding="utf-8") as f:
         for line in f:
@@ -51,25 +52,34 @@ def parse_large_file(target_file: str) -> dict:
         latencies.sort()
         p95_latency = latencies[int(len(latencies) * 0.95)]
 
-    return {"total_lines": line_count,
-            "malformed_lines_count": malformed_line_count,
-            "error_lines_count": err_line_count,
-            "error_codes": error_codes.most_common(),
-            "status_codes": status_codes.most_common(),
-            "latency_count": latency_count,
-            "p95_latency_ms": p95_latency,
-            "avg_latency_ms": round(avg_latency, 2)}
+    valid_lines = line_count - malformed_line_count
+
+    if valid_lines > 0:
+        error_rate = err_line_count / valid_lines
+
+    return {"total_lines": line_count, "malformed_lines_count": malformed_line_count,
+            "error_lines_count": err_line_count, "error_codes": error_codes.most_common(),
+            "status_codes": status_codes.most_common(), "latency_count": latency_count, "p95_latency_ms": p95_latency,
+            "avg_latency_ms": round(avg_latency, 2), "error_rate": error_rate, "valid_lines": valid_lines}
 
 
 def main():
     start = time.perf_counter()
     parser = argparse.ArgumentParser(description="Parse large file")
     parser.add_argument("log_file", help="path to log file")
+    parser.add_argument("--max-error-rate", type=float, default=0.05,
+                        help="exit with code 1 if error rate is above this (default 0.05 = 5%%)")
     args = parser.parse_args()
     summary = parse_large_file(args.log_file)
     if summary["total_lines"] == 0:
         print(f"Empty file: {args.log_file}")
         sys.exit(1)
+
+    if summary["valid_lines"] == 0:
+        print(f"Error: no valid lines in file: {args.log_file}",
+        f"({summary['malformed_lines_count']} Malformed lines)", file=sys.stderr)
+        sys.exit(1)
+
 
     with open("summary.json", "w", newline="") as out:
         json.dump(summary, out, indent=2)
@@ -79,6 +89,7 @@ def main():
         writer.writerow(["metric", "value"])
         writer.writerow(["total linecount", summary['total_lines']])
         writer.writerow(["error linecount", summary['error_lines_count']])
+        writer.writerow(["malformed lines", summary['malformed_lines_count']])
         for code, count in summary["error_codes"]:
             writer.writerow([f"error_code:{code}", count])
         for code, count in summary['status_codes']:
@@ -86,6 +97,7 @@ def main():
         writer.writerow(["latency count", summary['latency_count']])
         writer.writerow(["avg latency (ms)", summary['avg_latency_ms']])
         writer.writerow(["p95 latency (ms)", summary['p95_latency_ms']])
+        writer.writerow(["error rate", round(summary['error_rate'], 4)])
 
     print(f"Total linecount: {summary['total_lines']}")
     print(f"Malformed linecount: {summary['malformed_lines_count']}")
@@ -97,6 +109,13 @@ def main():
     print(f"p95 latency (ms): {summary['p95_latency_ms']}")
     elapsed = time.perf_counter() - start
     print(f"Completed time: {elapsed:.1f} seconds")
+
+    if summary['error_rate'] > args.max_error_rate:
+        print(f"Alert: error rate: {summary['error_rate']:.2%} exceeds threshold {args.max_error_rate:.2%}",
+              file=sys.stderr)
+        sys.exit(1)
+    else:
+        print(f"OK: error_rate {summary['error_rate']:.2%} is within threshold {args.max_error_rate:.2%}")
 
 
 if __name__ == "__main__":
