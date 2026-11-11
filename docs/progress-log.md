@@ -33,3 +33,5 @@ One short entry per study day: what I built, what broke, and the technical term 
     - Exit code: 0=success,1= error, 127= command not found.Scheduler, CI/CD decides pass/fail from error code.
     - fail safe: an alert that can't read its input must fail, not ok
     - understood file permissions 4=read,2=write,1=execute
+  - Day 5: "Added Linux group, users and chown,640 secrets,Group-based access and the owner only chmod rule. assigned user group to group and give permission to app.conf file later assign rw permission to me"
+  - 
