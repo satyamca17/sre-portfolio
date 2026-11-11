@@ -29,3 +29,7 @@ One short entry per study day: what I built, what broke, and the technical term 
                “Checking a port immediately after starting a service can miss it. That’s a race condition, which is why health checks
                 need startup delays.”
                “I stop services with SIGTERM first and confirm with ss and curl that the port is closed.”
+    - Week1 review: Learned parse structured logs, understood grep , installed linux and SIGTERM(KILL) Lets process clean up , SIGTERM(KILL -9) doesn't.
+    - Exit code: 0=success,1= error, 127= command not found.Scheduler, CI/CD decides pass/fail from error code.
+    - fail safe: an alert that can't read its input must fail, not ok
+    - understood file permissions 4=read,2=write,1=execute
