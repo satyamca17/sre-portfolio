@@ -34,7 +34,6 @@ One short entry per study day: what I built, what broke, and the technical term 
     - fail safe: an alert that can't read its input must fail, not ok
     - understood file permissions 4=read,2=write,1=execute
   - Day 5: "Added Linux group, users and chown,640 secrets,Group-based access and the owner only chmod rule. assigned user group to group and give permission to app.conf file later assign rw permission to me"
-<<<<<<< Updated upstream
   - - Day 6: Ran the loan app as a systemd service (deploy/loanapp.service).
   First start failed with status=203/EXEC: the venv path did not exist in WSL.
   Restart=on-failure turned it into a crash loop (restart counter 34) because
@@ -43,9 +42,7 @@ One short entry per study day: what I built, what broke, and the technical term 
   Self-healing test: kill -9 on PID 1636, systemd restarted it as PID 1676, /health ok.
   "enable = start at boot, start = run now. SIGKILL is a failure so systemd restarts;
    systemctl stop sends SIGTERM and is not restarted."
-=======
   - - Linux lab 4 (systemd): wrote unit files, enable vs start, journalctl -u / -f.
   Debugged 203/EXEC (wrong binary path) and Errno 98 (port conflict, two
   services on 8080). Tested self-healing: kill -9 on loanapp, systemd
   auto-restarted it in 5s with a new PID. StartLimitBurst stops crash loops.
->>>>>>> Stashed changes
