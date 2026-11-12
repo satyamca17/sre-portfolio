@@ -22,6 +22,7 @@ python generate_logs.py --lines 2000000 --out sample.log
 5. Take the file path as a command-line argument (`argparse`).
 6. Print how long the run took.
 
+
 ## Stretch goals
 
 - `--since` / `--until` options to filter by time window

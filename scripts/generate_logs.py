@@ -23,7 +23,7 @@ PATHS = ["/applications", "/applications/{id}", "/applications/{id}/advance", "/
 def make_line(ts):
     roll = random.random()
     if roll < 0.001:
-        return "### corrupted line ###"            # malformed: your parser must survive this
+        return "### corrupted line ###"  # malformed: your parser must survive this
     if roll < 0.03:
         return json.dumps({"ts": ts.isoformat(), "level": "ERROR", "msg": "stage_failed",
                            "app_id": f"{random.randint(0, 0xFFFFFF):06x}",
