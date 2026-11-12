@@ -34,4 +34,11 @@ One short entry per study day: what I built, what broke, and the technical term 
     - fail safe: an alert that can't read its input must fail, not ok
     - understood file permissions 4=read,2=write,1=execute
   - Day 5: "Added Linux group, users and chown,640 secrets,Group-based access and the owner only chmod rule. assigned user group to group and give permission to app.conf file later assign rw permission to me"
-  - 
+  - - Day 6: Ran the loan app as a systemd service (deploy/loanapp.service).
+  First start failed with status=203/EXEC: the venv path did not exist in WSL.
+  Restart=on-failure turned it into a crash loop (restart counter 34) because
+  RestartSec=5 never hit the default start limit. Added StartLimitBurst=3 in 60s.
+  A failed python3 -m venv left a half-built venv (symlink but no pip): deleted and rebuilt it.
+  Self-healing test: kill -9 on PID 1636, systemd restarted it as PID 1676, /health ok.
+  "enable = start at boot, start = run now. SIGKILL is a failure so systemd restarts;
+   systemctl stop sends SIGTERM and is not restarted."

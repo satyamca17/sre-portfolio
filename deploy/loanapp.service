@@ -1,0 +1,16 @@
+[Unit]
+Description=Loan application Flask service
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+User=nanis
+WorkingDirectory=/home/nanis/sre-portfolio
+ExecStart=/home/nanis/sre-portfolio/venv/bin/python app/main.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
